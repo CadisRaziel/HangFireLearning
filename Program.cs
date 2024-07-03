@@ -1,4 +1,5 @@
 using Hangfire;
+using HangfireBasicAuthenticationFilter;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,5 +36,27 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+//-> quando o swagger abrir coloque dessa forma (https://localhost:7223/Hangfire) o /HangFire vai abrir a dashBoard do hangfire
+//app.UseHangfireDashboard();
+
+//"/job-dashboard" -> ao inves de colocar hangfire na url colocamos o /job-dashboard
+//app.UseHangfireDashboard("/job-dashboard"); 
+
+app.UseHangfireDashboard("/job-dashboard", new DashboardOptions
+{
+    DashboardTitle = "Titulo qualquer", //-> titulo que vai aparecer ao abrir a dashboard do hangfire
+    DisplayStorageConnectionString = false, //-> para nao aparecer o nome da conexao com sql na parte debaixo do dashboard
+
+    //Colocando authenticacao (usando o package Hangfire.Dashboard.Basic.Authentication)
+    Authorization = new[]
+    {
+        new HangfireCustomBasicAuthenticationFilter
+        {
+            User= "admin",
+            Pass= "admin"
+        }
+    }
+}); 
 
 app.Run();
